@@ -9,10 +9,14 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.chrome.options import Options
+
 
 class TestSmokeTest():
   def setup_method(self, method):
-    self.driver = webdriver.Firefox()
+    options = Options()
+    options.add_argument("--headless=new")
+    self.driver = webdriver.Chrome(options=options)
     self.vars = {}
   
   def teardown_method(self, method):
@@ -61,48 +65,47 @@ class TestSmokeTest():
     self.driver.find_element(By.CSS_SELECTOR, ".home-main").click()
     self.driver.find_element(By.CSS_SELECTOR, "#hamburger-equiv > img").click()
     self.driver.find_element(By.LINK_TEXT, "Join").click()
-    elements = self.driver.find_elements(By.NAME, "fname")
-    assert len(elements) > 0
-    self.driver.find_element(By.NAME, "fname").click()
-    self.driver.find_element(By.NAME, "fname").send_keys("Jason ")
+
+    WebDriverWait(self.driver, 5).until(
+        expected_conditions.presence_of_element_located((By.NAME, "fname"))
+    )
+    self.driver.find_element(By.NAME, "fname").send_keys("Jason")
     self.driver.find_element(By.NAME, "lname").send_keys("Yale")
     self.driver.find_element(By.NAME, "bizname").send_keys("Teton Farms")
     self.driver.find_element(By.NAME, "biztitle").send_keys("Manager")
     self.driver.find_element(By.NAME, "submit").click()
-    elements = self.driver.find_elements(By.NAME, "email")
-    assert len(elements) > 0
-    self.driver.find_element(By.NAME, "submit").click()
-    self.driver.find_element(By.NAME, "cellphone").send_keys("208-282-9289")
-    self.driver.find_element(By.NAME, "email").click()
-    self.driver.find_element(By.NAME, "cellphone").click()
-    self.driver.find_element(By.NAME, "email").click()
-    element = self.driver.find_element(By.NAME, "email")
-    actions = ActionChains(self.driver)
-    actions.move_to_element(element).click_and_hold().perform()
-    element = self.driver.find_element(By.NAME, "email")
-    actions = ActionChains(self.driver)
-    actions.move_to_element(element).perform()
-    element = self.driver.find_element(By.NAME, "email")
-    actions = ActionChains(self.driver)
-    actions.move_to_element(element).release().perform()
-    self.driver.find_element(By.NAME, "email").click()
-    self.driver.find_element(By.NAME, "submit").click()
-    self.driver.find_element(By.NAME, "email").click()
+
+    WebDriverWait(self.driver, 5).until(
+        expected_conditions.presence_of_element_located((By.NAME, "email"))
+    )
     self.driver.find_element(By.NAME, "email").send_keys("jasontest@gmail.com")
-    self.driver.find_element(By.NAME, "cellphone").click()
+    self.driver.find_element(By.NAME, "cellphone").send_keys("208-282-9289")
     self.driver.find_element(By.NAME, "submit").click()
+
+    WebDriverWait(self.driver, 5).until(
+        expected_conditions.presence_of_element_located((By.CSS_SELECTOR, ".myradio input"))
+    )
     self.driver.find_element(By.CSS_SELECTOR, ".myradio:nth-child(13) > input").click()
     self.driver.find_element(By.NAME, "submit").click()
+
+    WebDriverWait(self.driver, 5).until(
+        expected_conditions.presence_of_element_located((By.CSS_SELECTOR, "textarea"))
+    )
     self.driver.find_element(By.CSS_SELECTOR, "textarea").send_keys("hello my business.")
     self.driver.find_element(By.NAME, "submit").click()
-    self.driver.find_element(By.NAME, "websiteURL").click()
-    self.driver.find_element(By.CSS_SELECTOR, "textarea").click()
-    self.driver.find_element(By.NAME, "submit").click()
-    self.driver.find_element(By.NAME, "websiteURL").click()
+
+    WebDriverWait(self.driver, 5).until(
+        expected_conditions.presence_of_element_located((By.NAME, "websiteURL"))
+    )
     self.driver.find_element(By.NAME, "websiteURL").send_keys("https://www.test.com")
     self.driver.find_element(By.NAME, "submit").click()
-    assert self.driver.find_element(By.CSS_SELECTOR, ".thankyou").text == "Thank you for joining the chamber! We're excited to have you with us."
-  
+
+    WebDriverWait(self.driver, 5).until(
+        expected_conditions.presence_of_element_located((By.CSS_SELECTOR, ".thankyou"))
+    )
+    thank_you_text = self.driver.find_element(By.CSS_SELECTOR, ".thankyou").text
+    assert thank_you_text == "Thank you for joining the chamber! We're excited to have you with us."
+
   def test_nameandLogoTest(self):
     self.driver.get("http://127.0.0.1:5500/teton/1.6/index.html")
     self.driver.set_window_size(855, 990)
